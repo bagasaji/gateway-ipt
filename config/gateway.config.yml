@@ -1,0 +1,41 @@
+http:
+  port: 8080
+admin:
+  port: 9876
+  host: localhost
+##############
+policies:
+  - basic-auth
+  - cors
+  - expression
+  - key-auth
+  - log
+  - oauth2
+  - proxy
+  - rate-limit
+  - jwt
+##############
+apiEndpoints:
+  balance-inquiry:
+    host: "*"
+    # paths: "/bi/openapi/balance-inquiry"
+    paths: ['/bi/openapi/balance-inquiry', '/bi/openapi/balance-inquiry/:accountId']
+##############
+serviceEndpoints:
+  balance-inquiry-srv:
+    url: "http://localhost:4000/"
+##############
+pipelines:
+  - name: balance-inquiry
+    apiEndpoints:
+      - balance-inquiry
+    policies:
+      # - jwt:
+      #     - action:
+      #         checkCredentialExistence: false
+      #         secretOrPublicKey: '/app/public.pem'
+      - proxy:
+          - action:
+              serviceEndpoint: balance-inquiry-srv
+              changeOrigin: false
+              pretendPath: false
